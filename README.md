@@ -4,13 +4,7 @@ A Claude Code mod that makes Claude feel calm and friendly for people who aren't
 
 While Claude works, tool calls, file changes and command output are hidden. A simple checklist sits above the prompt instead, so you can always see the plan, what's happening now and how far along it is:
 
-```
-Build my landing page · 1m 12s                     [ ● Clean View: ON ]
-✓ Read your brand notes            ██████████  Done
-▶ Build the pricing section        ██████░░░░  60%
-○ Add the contact form             ░░░░░░░░░░  Next
-○ Polish the footer                ░░░░░░░░░░  Up next
-```
+![The Clean View checklist above the prompt: "Build my landing page · 1m 12s" with the Clean View: ON button, one step done, "Build the pricing section" at 60%, and two steps marked Next and Up next](docs/checklist.svg)
 
 The top line changes to show what's going on:
 
