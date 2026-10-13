@@ -94,6 +94,23 @@ test('a permission prompt shows Needs you', async ($, on) => {
   }
 })
 
+test('a turn that ends waiting on the person shows the step as Paused, not Working', async ($, on) => {
+  mock.clock(on)
+  mock.store(on)
+  on('turn.complete', ($, e) => ({ text: e.answer }))
+  await $.tool.call({ tool: PLAN, steps: ['Agree the fix with you', 'Apply the fix'] })
+  await $.turn.complete({ answer: 'Shall I go ahead?', durationMs: 1, isAborted: false, turnId: 'turn-1', reason: 'answer' })
+
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ ...BAND, surface })
+    const texts = (await ui.findAll({ type: 'Text' })).map(t => t.text).join('\n')
+    expect(texts).toContain('Needs you')
+    expect(texts).toMatch(/‖ \nAgree the fix with you\s+\n░{10}\n Paused/)
+    expect(texts).not.toContain('Working')
+    await ui.unmount()
+  }
+})
+
 test('/simple off hides the band and leaves only the button', async ($, on) => {
   const saved: Record<string, unknown> = {}
   mock.clock(on)
