@@ -1,0 +1,9 @@
+{
+  "name": "clean-view",
+  "version": "0.1.0",
+  "description": "A calm, friendly view: hides technical rows and shows a plain-English checklist above the prompt.",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Peter Ngai"
+  }
+}
