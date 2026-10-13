@@ -269,10 +269,10 @@ async function isEnabled($: $): Promise<boolean> {
   return read($, enabledAtom)
 }
 
-/** Runs or stops the 250ms animation clock to match the job's state. */
+/** Runs the 250ms animation clock only while the job is working; a paused step stands still. */
 async function syncTicker($: $): Promise<void> {
   const checklist = await read($, checklistAtom)
-  const isLive = checklist !== null && (checklist.phase === 'working' || checklist.phase === 'needsYou')
+  const isLive = checklist !== null && checklist.phase === 'working'
 
   if (isLive && ticker === null) {
     ticker = $.clock.every(FRAME_MS, () => {
@@ -672,7 +672,7 @@ export function registerCleanView(on: On): void {
     const { Box, Text, Button } = $.ui.resolve(e)
     const enabled = await isEnabled($)
     const checklist = enabled ? await read($, checklistAtom) : null
-    const tick = checklist !== null && (checklist.phase === 'working' || checklist.phase === 'needsYou') ? await read($, tickAtom) : 0
+    const tick = checklist !== null && checklist.phase === 'working' ? await read($, tickAtom) : 0
     const width = Math.max(24, e.props.bodyColumns)
 
     const label = enabled ? '● Clean View: ON' : '○ Clean View: OFF'
@@ -742,7 +742,8 @@ export function registerCleanView(on: On): void {
       }
 
       if (task.status === 'active') {
-        const isPaused = checklist.phase === 'needsYou'
+        // Waiting on the person, stuck or stopped: the active step is paused, not working.
+        const isPaused = checklist.phase !== 'working'
         let meter: string
         let status: string
 
@@ -750,6 +751,9 @@ export function registerCleanView(on: On): void {
           const filled = Math.round(task.percent / 10)
           meter = '█'.repeat(filled) + '░'.repeat(METER - filled)
           status = `${task.percent}%`
+        } else if (isPaused) {
+          meter = '░'.repeat(METER)
+          status = 'Paused'
         } else {
           const at = tick % (METER + 3)
           meter = Array.from({ length: METER }, (_, i) => (i <= at && i > at - 3 ? '█' : '░')).join('')
